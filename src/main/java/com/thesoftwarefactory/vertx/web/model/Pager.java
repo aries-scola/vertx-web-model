@@ -269,6 +269,15 @@ public class Pager {
 		return this;
 	}
 
+	public Pager buildPreviousNext(I18n i18n, long totalResults, int pageIndex, int pageSize, Resolver<Integer, Link> resolver) {
+		return buildPreviousNext(i18n.text("pager.previous"), 
+							i18n.text("pager.next"), 
+							totalResults, 
+							pageIndex, 
+							pageSize, 
+							resolver);
+	}
+	
 	public Pager buildPreviousNext(String previous, String next, long totalResults, int pageIndex, int pageSize, Resolver<Integer, Link> resolver) {
 		int previousPageIndex = pageIndex - 1;
 		int nextPageIndex = pageIndex + 1;

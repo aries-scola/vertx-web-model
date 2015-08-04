@@ -253,7 +253,7 @@ public class Form<T> {
 		}
 	}
 
-	public static class Field {		
+	public class Field {		
 		private String name = null;
 		private String type = null;
 		private String value = null;
@@ -342,7 +342,7 @@ public class Form<T> {
 		}
 		
 		public boolean readonly() {
-			return readonly;
+			return Form.this.isReadonly() || readonly;
 		}
 
 		public void readonly(boolean readOnly) {
@@ -401,7 +401,7 @@ public class Form<T> {
 			if (property.getReadMethod()!=null && property.getWriteMethod()!=null) {
 			// the property has a getter and setter
 				String fieldName = fieldPrefix!=null ? fieldPrefix + property.getName() : property.getName();
-				result.addField(new Field(fieldName, Form.fieldTypefromClass(property.getPropertyType())));
+				result.addField(result.new Field(fieldName, Form.fieldTypefromClass(property.getPropertyType())));
 			}
 		}
 
@@ -674,6 +674,10 @@ public class Form<T> {
 		return Collections.emptyList();
 	}
 
+	public boolean isReadonly() {
+		return readonly;
+	}
+
 	public String referer() {
 		return referer;
 	}
@@ -693,12 +697,9 @@ public class Form<T> {
 		return this;
 	}
 	
-	public boolean isReadonly() {
-		return readonly;
-	}
-
-	public void setReadonly(boolean readonly) {
+	public Form<T> setReadonly(boolean readonly) {
 		this.readonly = readonly;
+		return this;
 	}
 
 	public final static String fieldTypefromClass(Class<?> cls) {

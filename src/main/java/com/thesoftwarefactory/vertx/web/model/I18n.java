@@ -252,6 +252,13 @@ public class I18n {
 		this.resourceBundleLocations = resourceBundleLocations;
 	}
 
+	public String currency(Object value) {
+		Objects.requireNonNull(value);
+		
+		Format formatter = NumberFormat.getCurrencyInstance(locale);
+		return formatter.format(value);
+	}
+
 	public String currency(Number value) {
 		Objects.requireNonNull(value);
 		
