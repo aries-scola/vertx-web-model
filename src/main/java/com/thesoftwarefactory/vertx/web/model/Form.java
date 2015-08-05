@@ -660,6 +660,12 @@ public class Form<T> {
 		return false;
 	}
 
+	public Field addField(String name, String type) {
+		Field field = new Field(name, type);
+		addField(field);
+		return field;
+	}
+	
 	public Field field(String fieldName) {
 		if (fields!=null) {
 			return fields.get(fieldName);
