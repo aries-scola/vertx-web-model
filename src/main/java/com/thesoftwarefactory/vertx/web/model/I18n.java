@@ -253,17 +253,11 @@ public class I18n {
 	}
 
 	public String currency(Object value) {
-		Objects.requireNonNull(value);
-		
-		Format formatter = NumberFormat.getCurrencyInstance(locale);
-		return formatter.format(value);
+		return value!=null ? NumberFormat.getCurrencyInstance(locale).format(value) : null;
 	}
 
 	public String currency(Number value) {
-		Objects.requireNonNull(value);
-		
-		Format formatter = NumberFormat.getCurrencyInstance(locale);
-		return formatter.format(value);
+		return value!=null ? NumberFormat.getCurrencyInstance(locale).format(value) : null;
 	}
 
 	public String date(Date value, String pattern) {
