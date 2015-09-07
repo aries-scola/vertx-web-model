@@ -388,6 +388,17 @@ public class Form<T> {
 	 * @param fieldPrefix: if not null, the prefix is prepended to each field name 
 	 * @return
 	 */
+	public final static <T> Form<T> fromClass(Class<T> cls) {
+		return fromClass(cls, null);
+	}
+	
+	/**
+	 * Build a new Form instance from the specified class
+	 * 
+	 * @param cls
+	 * @param fieldPrefix: if not null, the prefix is prepended to each field name 
+	 * @return
+	 */
 	public final static <T> Form<T> fromClass(Class<T> cls, String fieldPrefix) {
 		Objects.requireNonNull(cls);
 	
