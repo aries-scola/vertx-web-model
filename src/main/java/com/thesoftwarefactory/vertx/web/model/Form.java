@@ -218,7 +218,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
@@ -227,39 +229,13 @@ import org.springframework.beans.InvalidPropertyException;
 
 public class Form<T> {
 
-    final static Logger logger = Logger.getLogger(Form.class.getName());
-
-    private boolean readonly = false;
-    private Set<String> errors = null;
-
-	public static class PossibleValue {		
-		private String label = null;
-		private String value = null;
-		
-		public PossibleValue(String value, String label) {
-			Objects.requireNonNull(value);
-			Objects.requireNonNull(label);
-			
-			this.value = value;
-			this.label = label;
-		}
-
-		public String getLabel() {
-			return label;
-		}
-		
-		public String getValue() {
-			return value;
-		}
-	}
-
-	public class Field {		
+    public class Field {		
+		private Set<String> errors = null;
 		private String name = null;
+		private Collection<PossibleValue> possibleValues = null;
+		private boolean readonly = false;
 		private String type = null;
 		private String value = null;
-		private boolean readonly = false;
-		private Set<String> errors = null;
-		private Collection<PossibleValue> possibleValues = null;
 		
 		public Field(String name, String type) {
 			Objects.requireNonNull(name);
@@ -323,6 +299,14 @@ public class Form<T> {
 			return possibleValues;
 		}
 		
+		public boolean readonly() {
+			return Form.this.isReadonly() || readonly;
+		}
+
+		public void readonly(boolean readOnly) {
+			this.readonly = readOnly;
+		}
+		
 		public String type() {
 			return type;
 		}
@@ -340,29 +324,47 @@ public class Form<T> {
 			this.value = value;
 			return this;
 		}
+	}
+    public static class PossibleValue {		
+		private String label = null;
+		private String value = null;
 		
-		public boolean readonly() {
-			return Form.this.isReadonly() || readonly;
+		public PossibleValue(String value, String label) {
+			Objects.requireNonNull(value);
+			Objects.requireNonNull(label);
+			
+			this.value = value;
+			this.label = label;
 		}
 
-		public void readonly(boolean readOnly) {
-			this.readonly = readOnly;
+		public String getLabel() {
+			return label;
 		}
-	}
+		
+		public String getValue() {
+			return value;
+		}
+	}  
+    final static Logger logger = Logger.getLogger(Form.class.getName());
+    
+    private static Validator validator;
+    private static ValidatorFactory validatorFactory;
+
+	public final static String fieldTypefromClass(Class<?> cls) {
+		Objects.requireNonNull(cls);
 	
-	public Form<T> addError(String error) {
-		if (errors==null) {
-			errors = new HashSet<>();
+		// by default return TEXT
+		String result = "text";
+		if (cls.equals(Boolean.class) || cls.equals(boolean.class)) {
+			result = "checkbox";
 		}
-		errors.add(error);
-		return this;
-	}
-	
-	public Collection<String> errors() {
-		if (errors==null) {
-			return Collections.emptyList();
+		else if (Number.class.isAssignableFrom(cls)) {
+			result = "number";
+		} 
+		else if (cls.isEnum()) {
+			result = "select";
 		}
-		return errors;
+		return result;
 	}
 
 	/**
@@ -372,15 +374,25 @@ public class Form<T> {
 	 * @param fieldPrefix: if not null, the prefix is prepended to each field name 
 	 * @return
 	 */
-	public final static <T> Form<T> fromBean(Validator validator, T object, String fieldPrefix, String referer) {
+	public final static <T> Form<T> fromBean(T object) {
+		return fromBean(object, null);
+	}
+	
+	/**
+	 * Build a new Form instance from the specified object
+	 * 
+	 * @param object
+	 * @param fieldPrefix: if not null, the prefix is prepended to each field name 
+	 * @return
+	 */
+	public final static <T> Form<T> fromBean(T object, String fieldPrefix) {
 		Objects.requireNonNull(object);
 		
 		@SuppressWarnings("unchecked")
 		Form<T> result = (Form<T>) Form.fromClass(object.getClass(), fieldPrefix);
-        result.referer = referer;
-		return result.bindObject(validator, object);
+		return result.bindObject(object);
 	}
-
+	
 	/**
 	 * Build a new Form instance from the specified class
 	 * 
@@ -391,7 +403,7 @@ public class Form<T> {
 	public final static <T> Form<T> fromClass(Class<T> cls) {
 		return fromClass(cls, null);
 	}
-	
+
 	/**
 	 * Build a new Form instance from the specified class
 	 * 
@@ -418,6 +430,7 @@ public class Form<T> {
 
 		return result;
 	}
+	
 	/**
 	 * validate the specified bean, optionally validating only the specified properties
 	 * 
@@ -454,15 +467,41 @@ public class Form<T> {
 		return result!=null ? result : Collections.emptySet();
 	}
 
-	private T object = null;
-	private Map<String, Field> fields = null;
+	private final static Validator validator() {
+		if (validator==null) {
+			validator = validatorFactory().getValidator();
+		}
+		return validator;
+	}
+	
+	private final static ValidatorFactory validatorFactory() {
+		if (validatorFactory==null) {
+			validatorFactory = Validation.buildDefaultValidatorFactory();  
+		}
+		return validatorFactory;
+	}
+	private Set<String> errors = null;
+
 	private String fieldPrefix = null;
+	private Map<String, Field> fields = null;
+	private boolean isValidated = false;
+	private T object = null;
+	private boolean readonly = false;
 	private String referer = null;
+	
 	private String url = null;
 	
 	public Form() {
 	}
-	
+
+	public Form<T> addError(String error) {
+		if (errors==null) {
+			errors = new HashSet<>();
+		}
+		errors.add(error);
+		return this;
+	}
+
 	public Form<T> addField(Field field) {
 		Objects.requireNonNull(field);
 		Objects.requireNonNull(field.name());
@@ -474,6 +513,12 @@ public class Form<T> {
 		return this;
 	}
 
+	public Field addField(String name, String type) {
+		Field field = new Field(name, type);
+		addField(field);
+		return field;
+	}
+	
 	/**
 	 * bind all or only the specified properties of the object to this Form. 
 	 * Validation is automatically performed after the binding, validating all or only the specified properties. 
@@ -483,45 +528,25 @@ public class Form<T> {
 	 * @param properties
 	 * @return
 	 */
-	public Form<T> bindObject(Validator validator, T object, String... properties) {
+	public Form<T> bindObject(T object, String... properties) {
 		if (object!=null) {
 			this.object = object;
-			int boundPropertyCount = 0; 
 			BeanWrapper beanWrapper = new BeanWrapperImpl(object);
 			for (Field field: fields()) {
 				// if applicable, remove the fieldPrefix to get the bean field name 
 				String fieldName = fieldPrefix!=null ? field.name().substring(fieldPrefix.length()) : field.name();
 				PropertyDescriptor property = beanWrapper.getPropertyDescriptor(fieldName);
 				if (property!=null && property.getReadMethod()!=null) {
-					boundPropertyCount++;
 					Object propertyValue = beanWrapper.getPropertyValue(fieldName);
 					String strPropValue = propertyValue!=null ? propertyValue.toString() : null;
 					field.value(strPropValue);
-				}
-			}
-			
-			if (boundPropertyCount>0) {
-			// we bound some properties, this means it worth validating the bean
-				Set<ConstraintViolation<?>> constraintViolations = validate(validator, object, properties);
-				for (ConstraintViolation<?> constraintViolation: constraintViolations) {
-					if (constraintViolation.getPropertyPath().toString().isEmpty()) {
-						// Form error
-						addError(constraintViolation.getMessage());
-					} else {
-						// Field error
-						String fieldName = fieldPrefix!=null ? fieldPrefix + constraintViolation.getPropertyPath().toString() : constraintViolation.getPropertyPath().toString();
-						Field field = field(fieldName);
-						if (field!=null) {
-							field.addError(constraintViolation.getMessage());
-						}
-					}
 				}
 			}
 		}
 		return this;
 	}
 
-	/**
+    /**
 	 * return a copy of the form
 	 * 
 	 */
@@ -533,35 +558,6 @@ public class Form<T> {
 			result.addField(field.clone());
 		}
 		return result;
-	}
-
-	/**
-	 * remove all fields whose name is not contained in the specified properties
-	 * 
-	 * @param properties
-	 * @return
-	 */
-	public Form<T> filter(String... properties) {
-		Iterator<Entry<String, Field>> entries = fields.entrySet().iterator();
-		while (entries.hasNext()) {
-			Entry<String, Field> entry = entries.next();
-			boolean foundKey = false;
-			for (String property: properties) {
-				foundKey = property!=null && property.equalsIgnoreCase(entry.getKey());
-				if (foundKey) {
-					break;
-				}
-			}
-			// if we didn't find the property, remove it from the set
-			if (!foundKey) {
-				entries.remove();
-			}
-		}
-		return this;
-	}
-	
-	public T getObject() {
-		return object;
 	}
 
     /**
@@ -599,7 +595,28 @@ public class Form<T> {
         return result;
     }
 
-    /**
+    public Collection<String> errors() {
+		if (errors==null) {
+			return Collections.emptyList();
+		}
+		return errors;
+	}
+
+	public Field field(String fieldName) {
+		if (fields!=null) {
+			return fields.get(fieldName);
+		}
+		return null;
+	}
+
+	public Iterable<Field> fields() {
+		if (fields!=null) {
+			return fields.values();
+		}
+		return Collections.emptyList();
+	}
+	
+	/**
      * Creates a Bean with the given class from the from values
      * @param object Source object we're taking the values from
      * @return this object
@@ -633,7 +650,58 @@ public class Form<T> {
         return this;
     }
 
-    /**
+	/**
+	 * remove all fields whose name is not contained in the specified properties
+	 * 
+	 * @param properties
+	 * @return
+	 */
+	public Form<T> filter(String... properties) {
+		Iterator<Entry<String, Field>> entries = fields.entrySet().iterator();
+		while (entries.hasNext()) {
+			Entry<String, Field> entry = entries.next();
+			boolean foundKey = false;
+			for (String property: properties) {
+				foundKey = property!=null && property.equalsIgnoreCase(entry.getKey());
+				if (foundKey) {
+					break;
+				}
+			}
+			// if we didn't find the property, remove it from the set
+			if (!foundKey) {
+				entries.remove();
+			}
+		}
+		return this;
+	}
+
+	public T getObject() {
+		return object;
+	}
+
+	public boolean hasErrors() {
+		// make sure the bean is validated
+		if (!isValidated) {
+			validate();
+		}
+		if (errors != null && errors.size() > 0) {
+			return true;
+		}
+		if (fields!=null) {
+			for (Field field: fields.values()) {
+				if (field.hasErrors()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+    public boolean isReadonly() {
+		return readonly;
+	}
+
+	/**
      * Overwrites the values of the bean in parameter with the form values
      * @param source
      * @return
@@ -656,84 +724,49 @@ public class Form<T> {
         }
     }
 
-	public boolean hasErrors() {
-		if (errors != null && errors.size() > 0) {
-			return true;
-		}
-		
-		if (fields!=null) {
-			for (Field field: fields.values()) {
-				if (field.hasErrors()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public Field addField(String name, String type) {
-		Field field = new Field(name, type);
-		addField(field);
-		return field;
-	}
-	
-	public Field field(String fieldName) {
-		if (fields!=null) {
-			return fields.get(fieldName);
-		}
-		return null;
-	}
-
-	public Iterable<Field> fields() {
-		if (fields!=null) {
-			return fields.values();
-		}
-		return Collections.emptyList();
-	}
-
-	public boolean isReadonly() {
-		return readonly;
-	}
-
 	public String referer() {
 		return referer;
 	}
-
-    // should not be accessible from the outside to cleanly encapsulate and prevent mistakes
+	
+	// should not be accessible from the outside to cleanly encapsulate and prevent mistakes
 	public Form<T> referer(String referer) {
 		this.referer = referer;
-		return this;
-	}
-
-	public String url() {
-		return url;
-	}
-
-	public Form<T> url(String url) {
-		this.url = url;
 		return this;
 	}
 	
 	public Form<T> setReadonly(boolean readonly) {
 		this.readonly = readonly;
 		return this;
+	}	
+	
+	public String url() {
+		return url;
+	}
+	
+	public Form<T> url(String url) {
+		this.url = url;
+		return this;
 	}
 
-	public final static String fieldTypefromClass(Class<?> cls) {
-		Objects.requireNonNull(cls);
-	
-		// by default return TEXT
-		String result = "text";
-		if (cls.equals(Boolean.class) || cls.equals(boolean.class)) {
-			result = "checkbox";
+	public Form<T> validate(String... propertyNames) {
+		Validator validator = validator();  
+		 
+		Set<ConstraintViolation<?>> constraintViolations = validate(validator, object, propertyNames);
+		for (ConstraintViolation<?> constraintViolation: constraintViolations) {
+			if (constraintViolation.getPropertyPath().toString().isEmpty()) {
+				// Form error
+				addError(constraintViolation.getMessage());
+			} else {
+				// Field error
+				String fieldName = fieldPrefix!=null ? fieldPrefix + constraintViolation.getPropertyPath().toString() : constraintViolation.getPropertyPath().toString();
+				Field field = field(fieldName);
+				if (field!=null) {
+					field.addError(constraintViolation.getMessage());
+				}
+			}
 		}
-		else if (Number.class.isAssignableFrom(cls)) {
-			result = "number";
-		} 
-		else if (cls.isEnum()) {
-			result = "select";
-		}
-		return result;
+		isValidated = true;
+		return this;
 	}
 
 }
