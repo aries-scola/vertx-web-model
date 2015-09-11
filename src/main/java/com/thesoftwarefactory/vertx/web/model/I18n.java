@@ -211,6 +211,7 @@ import java.text.Format;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -275,6 +276,20 @@ public class I18n {
 		return formatter.format(value);
 	}
 
+	public String duration(Duration duration) {
+		if (duration==null) {
+			return "";
+		} else {
+			
+			long totalSec = duration.getSeconds();
+			long h = totalSec / 3600;
+			long m = (totalSec % 3600) / 60;
+			
+			return ((h!=0) ? (h + "h") : "")
+					+ ((m!=0) ? (h!=0 ? (m<10?"0"+m:m) : m+" min") : "");
+		}
+	}
+	
 	public String firstLower(String value) {
 		if (firstLowerFormatter==null) {
 			firstLowerFormatter = new FirstLowerFormatter();
