@@ -212,6 +212,7 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -267,6 +268,12 @@ public class I18n {
 		
 		Format formatter = new SimpleDateFormat(pattern, locale);
 		return formatter.format(value);
+	}
+	
+	private String date(Date date) {
+		Objects.requireNonNull(date);
+		
+		return SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT).format(date);
 	}
 
 	public String decimal(Number value, String pattern) {
@@ -367,6 +374,10 @@ public class I18n {
 		Objects.requireNonNull(value);
 		
 		return maxLength<value.length() ? value.substring(0, maxLength) + "..." : value;
+	}
+
+	public String instant(Instant instant) {
+		return date(Date.from(instant));
 	}
 	
 }
