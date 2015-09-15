@@ -210,10 +210,10 @@ public class Link implements Comparable<Link> {
 	private String icon = null;
 	private boolean isDisabled = false;
 	private boolean isSelected = false;
-	private String label = null;
-	private String tooltip = null; 
-	private String url = null;
-    private boolean isSubmit = false;
+	private boolean isSubmit = false;
+	private String label = null; 
+	private String tooltip = null;
+    private String url = null;
 
     public Link( String url, String label) {
     	Objects.requireNonNull(url);
@@ -236,20 +236,45 @@ public class Link implements Comparable<Link> {
         return this.url.compareTo(o.getUrl());
     }
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Link other = (Link) obj;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		return true;
+	}
+
 	public String getIcon() {
 		return icon;
 	}
-	
+
 	public String getLabel() {
 		return label;
 	}
-
+	
 	public String getTooltip() {
 		return tooltip;
 	}
-	
+
 	public String getUrl() {
 		return url;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		return result;
 	}
 	
 	public boolean isDisabled() {
