@@ -233,8 +233,7 @@ public class Link implements Comparable<Link> {
 
 	@Override
     public int compareTo(Link o) {
-
-        return this.label.compareTo(o.getLabel());
+        return this.url.compareTo(o.getUrl());
     }
 
 	public String getIcon() {
