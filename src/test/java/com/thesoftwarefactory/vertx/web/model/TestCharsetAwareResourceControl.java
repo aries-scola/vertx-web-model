@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 
 import org.junit.Test;
 
+import com.thesoftwarefactory.vertx.web.model.impl.CharsetAwareResourceControl;
+
 public class TestCharsetAwareResourceControl {
 
 	@Test

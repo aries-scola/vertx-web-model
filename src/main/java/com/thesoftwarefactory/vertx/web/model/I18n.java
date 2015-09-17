@@ -224,6 +224,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import com.thesoftwarefactory.vertx.web.model.formatter.impl.FirstLowerFormatter;
 import com.thesoftwarefactory.vertx.web.model.formatter.impl.FirstUpperFormatter;
 import com.thesoftwarefactory.vertx.web.model.formatter.impl.TitleCaseFormatter;
+import com.thesoftwarefactory.vertx.web.model.impl.CharsetAwareResourceControl;
 
 public class I18n {
 	private final static String DEFAULT_BUNDLE_NAME = "messages";

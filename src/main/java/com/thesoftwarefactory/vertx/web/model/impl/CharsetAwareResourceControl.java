@@ -201,7 +201,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.thesoftwarefactory.vertx.web.model;
+package com.thesoftwarefactory.vertx.web.model.impl;
 
 import java.io.IOException;
 import java.io.InputStream;

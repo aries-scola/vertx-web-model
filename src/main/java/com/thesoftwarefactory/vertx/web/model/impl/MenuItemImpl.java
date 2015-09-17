@@ -42,4 +42,10 @@ public class MenuItemImpl implements MenuItem {
 		return null;
 	}
 
+	@Override
+	public void parent(MenuItem parent) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
