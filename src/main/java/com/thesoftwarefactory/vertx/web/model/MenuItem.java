@@ -14,8 +14,8 @@ public interface MenuItem {
 
 	public MenuItem parent();
 
-	public void parent(MenuItem parent);
+	public MenuItem parent(MenuItem parent);
 
-	public MenuItem getByPath(String path);
+	public MenuItem getByUrl(String url);
 	
 }
