@@ -206,16 +206,19 @@ package com.thesoftwarefactory.vertx.web.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.SequenceInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 public class CharsetAwareResourceControl extends ResourceBundle.Control {
 
@@ -261,22 +264,21 @@ public class CharsetAwareResourceControl extends ResourceBundle.Control {
                     new PrivilegedExceptionAction<InputStream>() {
                         @Override
 						public InputStream run() throws IOException {
-                            InputStream is = null;
-                            if (reloadFlag) {
-                                URL url = classLoader.getResource(resourceName);
+                            Vector<InputStream> inputStreams = new Vector<>();
+                            Enumeration<URL> urls = classLoader.getResources(resourceName);
+                            while (urls.hasMoreElements()) {
+                                URL url = urls.nextElement();
                                 if (url != null) {
                                     URLConnection connection = url.openConnection();
                                     if (connection != null) {
                                         // Disable caches to get fresh data for
                                         // reloading.
                                         connection.setUseCaches(false);
-                                        is = connection.getInputStream();
+                                        inputStreams.addElement(connection.getInputStream());
                                     }
                                 }
-                            } else {
-                                is = classLoader.getResourceAsStream(resourceName);
-                            }
-                            return is;
+                        	}
+                            return inputStreams.size()>0 ? new SequenceInputStream(inputStreams.elements()) : null;
                         }
                     });
             } catch (PrivilegedActionException e) {
