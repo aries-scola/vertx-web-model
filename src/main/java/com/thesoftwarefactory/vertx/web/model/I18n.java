@@ -217,6 +217,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import com.thesoftwarefactory.vertx.web.model.formatter.impl.FirstLowerFormatter;
 import com.thesoftwarefactory.vertx.web.model.formatter.impl.FirstUpperFormatter;

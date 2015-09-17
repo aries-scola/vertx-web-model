@@ -324,7 +324,14 @@ public class Form<T> {
 			this.value = value;
 			return this;
 		}
+
+		@Override
+		public String toString() {
+			return "Field [errors=" + errors + ", name=" + name + ", possibleValues=" + possibleValues + ", readonly="
+					+ readonly + ", type=" + type + ", value=" + value + "]";
+		}
 	}
+    
     public static class PossibleValue {		
 		private String label = null;
 		private String value = null;
@@ -769,4 +776,10 @@ public class Form<T> {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return "Form [errors=" + errors + ", fieldPrefix=" + fieldPrefix + ", fields=" + fields + ", isValidated="
+				+ isValidated + ", object=" + object + ", readonly=" + readonly + ", referer=" + referer + ", url="
+				+ url + "]";
+	}
 }

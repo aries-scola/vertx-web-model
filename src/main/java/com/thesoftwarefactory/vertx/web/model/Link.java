@@ -216,10 +216,10 @@ public class Link implements Comparable<Link> {
     private String url = null;
 
     public Link( String url, String label) {
-    	Objects.requireNonNull(url);
     	Objects.requireNonNull(label);
     	
-        this.url = url;
+    	// FIXME : should be managed by callers
+        this.url = url != null ? url : "/";
         this.label = label;
     }
 
