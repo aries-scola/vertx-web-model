@@ -276,9 +276,6 @@ public abstract class BasePage<T extends BasePage<T>> {
 	}
 	
 	public Messages getMessages() {
-        if (messages==null) {
-            messages = new DefaultMessages();
-        }
 		return messages;
 	}
 
@@ -297,8 +294,6 @@ public abstract class BasePage<T extends BasePage<T>> {
 	}
 
 	public T setMessages(Messages messages) {
-		Objects.requireNonNull(messages);
-		
 		this.messages = messages;
 		return getThis();
 	}

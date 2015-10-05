@@ -201,73 +201,103 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.thesoftwarefactory.vertx.web.model;
+package com.thesoftwarefactory.vertx.web.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-public class DefaultMessages implements Messages {
-	private Map<String, Iterable<String>> fieldErrors = null;
-	private Map<String, Iterable<String>> fieldMessages = null;
-	private List<String> errors = null;
-	private List<String> messages = null;
+import com.thesoftwarefactory.vertx.web.model.Messages;
 
-    public DefaultMessages() {
-    }
-	
+public class MessagesImpl implements Messages {
+
+	private final static String KEY_INFOS = "infos";
+	private final static String KEY_ERRORS = "errors";
+	private final static String KEY_WARNINGS = "warnings";
+
+	private Map<String, Collection<String>> map;
+
+	public MessagesImpl() {
+		map = new HashMap<>();
+	}
+
+	@Override
+	public Messages add(String name, Collection<String> values) {
+		getOrNew(name).addAll(values);
+		return this;
+	}
+
+	@Override
+	public Messages add(String name, String value) {
+		getOrNew(name).add(value);
+		return this;
+	}
+
 	@Override
 	public Collection<String> errors() {
-		if (errors==null) {
-			errors = new ArrayList<>();
+		return getOrNew(KEY_ERRORS);
+	}
+
+	@Override
+	public String get(String name) {
+		Optional<String> result = getOrNew(name).stream().findFirst();
+		return result.isPresent() ? result.get() : null;
+	}
+
+	@Override
+	public Collection<String> getAll(String name) {
+		return getOrNew(name);
+	}
+
+	protected Map<String, Collection<String>> getMap() {
+		return map;
+	}
+
+	@Override
+	public Collection<String> getNames() {
+		return map.keySet();
+	}
+
+	private synchronized Collection<String> getOrNew(String name) {
+		Collection<String> result = map.get(name);
+		if (result == null) {
+			result = newKey(name);
 		}
-		return errors;
+		return result;
 	}
 
 	@Override
-	public Map<String, Iterable<String>> fieldErrors() {
-		if (fieldErrors==null) {
-			fieldErrors = new HashMap<>();
-		}
-		return fieldErrors;
-	}
-
-	@Override
-	public Map<String, Iterable<String>> fieldMessages() {
-		if (fieldMessages==null) {
-			fieldMessages = new HashMap<>();
-		}
-		return fieldMessages;
-	}
-
-	@Override
-	public boolean hasErrors() {
-		return errors!=null && !errors.isEmpty();
-	}
-
-	@Override
-	public boolean hasFieldErrors() {
-		return fieldErrors!=null && !fieldErrors.isEmpty();
-	}
-
-	@Override
-	public boolean hasFieldMessages() {
-		return fieldMessages!=null && !fieldMessages.isEmpty();
-	}
-
-	@Override
-	public boolean hasMessages() {
-		return messages!=null && !messages.isEmpty();
+	public boolean hasName(String name) {
+		return map.keySet().contains(name);
 	}
 
 	@Override
 	public Collection<String> messages() {
-		if (messages==null) {
-			messages = new ArrayList<>();
-		}
-		return messages;
+		return getOrNew(KEY_INFOS);
+	}
+	
+	protected Collection<String> newKey(String name) {
+		Collection<String> result = new ArrayList<>();
+		map.put(name, result);
+		return result;
+	}
+
+	@Override
+	public Messages remove(String name) {
+		map.remove(name);
+		return this;
+	}
+
+	protected void setMap(Map<String, Collection<String>> map) {
+		this.map = map;
+	}
+
+	@Override
+	public Collection<String> warnings() {
+		return getOrNew(KEY_WARNINGS);
 	}
 
 }

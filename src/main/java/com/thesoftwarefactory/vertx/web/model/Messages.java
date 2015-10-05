@@ -204,25 +204,34 @@
 package com.thesoftwarefactory.vertx.web.model;
 
 import java.util.Collection;
-import java.util.Map;
+
+import com.thesoftwarefactory.vertx.web.model.impl.MessagesImpl;
 
 public interface Messages {
+	
+	public static Messages create() {
+		return new MessagesImpl();
+	}	
+
+	public Messages add(String name, Collection<String> values);
+
+	public Messages add(String name, String value);
 
 	public Collection<String> errors();
+
+	public String get(String name);
+
+	public Collection<String> getAll(String name);
+
+	public Collection<String> getNames();
 	
-	public Map<String, Iterable<String>> fieldErrors();
-
-	public Map<String, Iterable<String>> fieldMessages();
+	public boolean hasName(String name);
 	
-	public boolean hasErrors();
-
-	public boolean hasFieldErrors();
-
-	public boolean hasFieldMessages();
-
-	public boolean hasMessages();
-
 	public Collection<String> messages();
-
+	
+	public Messages remove(String name);
+	
+	public Collection<String> warnings();
 
 }
+
