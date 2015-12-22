@@ -204,6 +204,10 @@
 package com.thesoftwarefactory.vertx.web.model;
 
 import java.beans.PropertyDescriptor;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -228,6 +232,13 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.InvalidPropertyException;
 
 public class Form<T> {
+	
+	private static final DateTimeFormatter INSTANT_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	
+	private static String format(Instant instant) {
+		LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneOffset.of("+2"));
+		return INSTANT_FORMATTER.format(ldt);
+	}
 
     public class Field {		
 		private Set<String> errors = null;
@@ -371,6 +382,7 @@ public class Form<T> {
 		else if (cls.isEnum()) {
 			result = "select";
 		}
+
 		return result;
 	}
 
@@ -545,7 +557,10 @@ public class Form<T> {
 				PropertyDescriptor property = beanWrapper.getPropertyDescriptor(fieldName);
 				if (property!=null && property.getReadMethod()!=null) {
 					Object propertyValue = beanWrapper.getPropertyValue(fieldName);
-					String strPropValue = propertyValue!=null ? propertyValue.toString() : null;
+					
+					String strPropValue = propertyValue!=null ? 
+							(propertyValue instanceof java.time.Instant ? format((java.time.Instant) propertyValue) :  propertyValue.toString() )
+							: null;
 					field.value(strPropValue);
 				}
 			}
