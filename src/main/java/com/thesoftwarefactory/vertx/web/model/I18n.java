@@ -384,4 +384,8 @@ public class I18n {
 		return date(Date.from(instant));
 	}
 	
+	public String dateTime(Instant instant) {
+		return date(Date.from(instant), "dd/MM/yyyy HH:mm");
+	}
+	
 }
