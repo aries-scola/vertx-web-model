@@ -214,6 +214,7 @@ public class Link implements Comparable<Link> {
 	private String label = null; 
 	private String tooltip = null;
     private String url = null;
+    private boolean openInNew = false;
 
     public Link( String url, String label) {
     	Objects.requireNonNull(label);
@@ -251,6 +252,15 @@ public class Link implements Comparable<Link> {
 		} else if (!url.equals(other.url))
 			return false;
 		return true;
+	}
+
+	public boolean isOpenInNew() {
+		return openInNew;
+	}
+
+	public Link setOpenInNew(boolean openInNew) {
+		this.openInNew = openInNew;
+		return this;
 	}
 
 	public String getIcon() {
