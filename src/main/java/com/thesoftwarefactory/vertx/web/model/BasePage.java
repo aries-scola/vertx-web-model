@@ -216,6 +216,7 @@ public abstract class BasePage<T extends BasePage<T>> {
 	private Link selectedNavigationLink = null;
 	private Collection<String> stylesheets = null;
 	private String title;
+	private Boolean minimalLayout;
 
 	public Link getSelectedNavigationLink() {
 		if (selectedNavigationLink==null) {
@@ -268,6 +269,15 @@ public abstract class BasePage<T extends BasePage<T>> {
 				stylesheets.add(url);
 			}
 		}
+		return getThis();
+	}
+
+	public Boolean getMinimalLayout() {
+		return minimalLayout;
+	}
+
+	public T setMinimalLayout(Boolean minimalLayout) {
+		this.minimalLayout = minimalLayout;
 		return getThis();
 	}
 
