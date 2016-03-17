@@ -216,6 +216,7 @@ public abstract class BasePage<T extends BasePage<T>> {
 	private Link selectedNavigationLink = null;
 	private Collection<String> stylesheets = null;
 	private String title;
+	private Popup popup;
 	private Boolean minimalLayout;
 
 	public Link getSelectedNavigationLink() {
@@ -301,6 +302,15 @@ public abstract class BasePage<T extends BasePage<T>> {
     
 	public String getTitle() {
 		return title;
+	}
+	
+	public Popup getPopup() {
+		return popup;
+	}
+
+	public T setPopup(Popup popup) {
+		this.popup = popup;
+		return getThis();
 	}
 
 	public T setMessages(Messages messages) {
