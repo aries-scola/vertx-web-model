@@ -274,7 +274,7 @@ public class I18n {
 	private String date(Date date) {
 		Objects.requireNonNull(date);
 		
-		return SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT).format(date);
+		return SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT, Locale.FRANCE).format(date);
 	}
 
 	public String decimal(Number value, String pattern) {
@@ -378,7 +378,7 @@ public class I18n {
 	}
 
 	public String instant(Instant instant) {
-		return date(Date.from(instant));
+		return date(Date.from(instant), "dd/MM/yyyy");
 	}
 	
 	public String dateTime(Instant instant) {
