@@ -1,5 +1,8 @@
 package com.thesoftwarefactory.vertx.web.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * A modal window
  */
@@ -7,8 +10,17 @@ public class Popup {
 	
 	private String title;
 	private String text;
+	private Collection<String> additionalText = new ArrayList<>();
 	private Link action;
 	
+	public Collection<String> getAdditionalText() {
+		return additionalText;
+	}
+
+	public void setAdditionalText(Collection<String> additionalText) {
+		this.additionalText = additionalText;
+	}
+
 	public String getTitle() {
 		return title;
 	}
