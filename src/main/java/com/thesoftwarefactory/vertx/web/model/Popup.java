@@ -20,6 +20,11 @@ public class Popup {
 	public void setAdditionalText(Collection<String> additionalText) {
 		this.additionalText = additionalText;
 	}
+	
+	public Popup addText(String text) {
+		getAdditionalText().add(text);
+		return this;
+	}
 
 	public String getTitle() {
 		return title;
