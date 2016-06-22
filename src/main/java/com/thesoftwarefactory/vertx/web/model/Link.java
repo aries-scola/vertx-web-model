@@ -207,6 +207,7 @@ import java.net.URL;
 import java.util.Objects;
 
 public class Link implements Comparable<Link> {
+	
 	private String icon = null;
 	private boolean isDisabled = false;
 	private boolean isSelected = false;
@@ -215,6 +216,8 @@ public class Link implements Comparable<Link> {
 	private String tooltip = null;
     private String url = null;
     private boolean openInNew = false;
+    private String onClick = null;
+    private boolean mainAction = false;
 
     public Link( String url, String label) {
     	Objects.requireNonNull(label);
@@ -252,6 +255,15 @@ public class Link implements Comparable<Link> {
 		} else if (!url.equals(other.url))
 			return false;
 		return true;
+	}
+	
+	public String getOnClick() {
+		return onClick;
+	}
+
+	public Link setOnClick(String onClick) {
+		this.onClick = onClick;
+		return this;
 	}
 
 	public boolean isOpenInNew() {
@@ -332,5 +344,14 @@ public class Link implements Comparable<Link> {
     public Link setUrl(String url) {
 		this.url = url;
 		return this;
+	}
+
+	public Link mainAction(boolean mainAction) {
+		this.mainAction = mainAction;
+		return this;
+	}
+	
+	public boolean mainAction() {
+		return this.mainAction;
 	}
 }
