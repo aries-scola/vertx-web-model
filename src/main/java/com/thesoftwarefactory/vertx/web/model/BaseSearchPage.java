@@ -226,6 +226,9 @@ public abstract class BaseSearchPage<T, B extends BaseSearchPage<T, B>> extends 
 	private Pager pager = null;
 	private Collection<Link> sortOptions = null;
     private Collection<String> columnNames = null;
+    private boolean filterOnDates = false;
+    private String minDate = null;
+    private String maxDate = null;
 	
 	public B addActionLink(Link... actionLinks) {
 		Objects.requireNonNull(actionLinks);
@@ -252,6 +255,33 @@ public abstract class BaseSearchPage<T, B extends BaseSearchPage<T, B>> extends 
 				this.filters.add(filter);
 			}
 		}
+		return getThis();
+	}
+	
+	public B filterOnDates(boolean filter) {
+		this.filterOnDates = filter;
+		return getThis();
+	}
+	
+	public boolean filterOnDates() {
+		return filterOnDates;
+	}
+
+	public String minDate() {
+		return minDate;
+	}
+
+	public B minDate(String minDate) {
+		this.minDate = minDate;
+		return getThis();
+	}
+
+	public String maxDate() {
+		return maxDate;
+	}
+
+	public B maxDate(String maxDate) {
+		this.maxDate = maxDate;
 		return getThis();
 	}
 
