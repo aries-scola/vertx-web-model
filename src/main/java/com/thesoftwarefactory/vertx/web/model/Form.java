@@ -247,6 +247,7 @@ public class Form<T> {
 		private boolean readonly = false;
 		private String type = null;
 		private String value = null;
+		private boolean multiple = false;
 		
 		public Field(String name, String type) {
 			Objects.requireNonNull(name);
@@ -333,6 +334,15 @@ public class Form<T> {
 
 		public Field value(String value) {
 			this.value = value;
+			return this;
+		}
+
+		public boolean multiple() {
+			return multiple;
+		}
+
+		public Field multiple(boolean multiple) {
+			this.multiple = multiple;
 			return this;
 		}
 
